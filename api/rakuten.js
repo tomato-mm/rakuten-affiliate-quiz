@@ -42,7 +42,7 @@ module.exports = async function handler(req, res) {
     const data = await response.json();
 
     if (!data.Items || data.Items.length === 0) {
-      return res.status(200).json({ items: [] });
+      return res.status(200).json({ debug: true, count: data.count, error: data.error, error_description: data.error_description });
     }
 
     const items = data.Items.map((item) => ({
