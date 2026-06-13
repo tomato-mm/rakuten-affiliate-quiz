@@ -39,7 +39,7 @@ module.exports = async function handler(req, res) {
     const data = await response.json();
 
     // デバッグ用：生レスポンスをそのまま返す
-    return res.status(200).json({ debug: true, url: url.replace(appId, 'APP_ID'), raw: data });
+    return res.status(200).json({ debug: true, appIdPrefix: appId ? appId.slice(0,4)+'****' : 'EMPTY', url: url.replace(appId, 'APP_ID'), raw: data });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
