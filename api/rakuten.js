@@ -6,7 +6,7 @@ const KEYWORD_MAP = {
   語学: '英語教材 大人',
 };
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   const genre = req.query.genre;
@@ -57,4 +57,4 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({ error: 'Failed to fetch Rakuten API' });
   }
-}
+};
