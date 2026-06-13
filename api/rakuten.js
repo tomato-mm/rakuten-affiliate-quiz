@@ -41,13 +41,16 @@ module.exports = async function handler(req, res) {
     const response = await fetch(url);
     const data = await response.json();
 
-    if (!data.Items || data.Items.length === 0) {
-      return res.status(200).json({ debug: true, count: data.count, error: data.error, error_description: data.error_description });
+    // 新APIは小文字 items、旧APIは大文字 Items
+    const rawItems = data.items || data.Items || [];
+
+    if (rawItems.length === 0) {
+      return res.status(200).json({ items: [], debug: { count: data.count, keys: Object.keys(data) } });
     }
 
-    const items = data.Items.map((item) => ({
+    const items = rawItems.map((item) => ({
       name: item.itemName,
-      imageUrl: item.mediumImageUrls?.[0]?.imageUrl || '',
+      imageUrl: item.mediumImageUrls?.[0]?.imageUrl || item.mediumImageUrls?.[0] || '',
       price: item.itemPrice,
       reviewCount: item.reviewCount,
       reviewAverage: item.reviewAverage,
