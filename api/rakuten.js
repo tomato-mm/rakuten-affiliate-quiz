@@ -29,8 +29,6 @@ module.exports = async function handler(req, res) {
     keyword,
     hits: '3',
     sort: '-reviewCount',
-    minReviewCount: '100',
-    minReviewAverage: '4.0',
     imageFlag: '1',
     formatVersion: '2',
   });
