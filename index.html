@@ -491,7 +491,40 @@ function showResult(){
   document.getElementById('score-card').innerHTML=sorted.map(g=>{const pct=Math.round((scores[g]/maxScore)*100);return`<div class="score-row"><span class="score-genre">${genreData[g].emoji} ${g}</span><div class="score-track"><div class="score-fill ${genreData[g].fillClass}" id="sf-${g}" style="width:0%"></div></div><span class="score-pct" id="sp-${g}">0%</span></div>`;}).join('');
   document.getElementById('tips-title').textContent=`${top}ジャンルで最初に取り組む3つのこと`;
   document.getElementById('tips-list').innerHTML=gd.tips.map((t,i)=>`<li class="tips-item"><span class="tips-num">${i+1}</span><span>${t}</span></li>`).join('');
-  // 商品セクション挿入（.cta-card の直前）
+  // 商品データ（ジャンルごとに手動設定）
+  // ★ URLをアフィリエイトリンクに差し替えてください ★
+  const productData = {
+    育児: [
+      { tag:'定番アイテム', emoji:'🪑', name:'ハイローチェア・バウンサー', desc:'赤ちゃんのねんね&あやしに大活躍', url:'https://www.rakuten.co.jp/' },
+      { tag:'人気商品',   emoji:'🧸', name:'知育おもちゃ・モンテッソーリ', desc:'月齢に合わせた発達サポートグッズ', url:'https://www.rakuten.co.jp/' },
+      { tag:'必需品',     emoji:'🍼', name:'離乳食セット・食器',            desc:'お食事エプロン・スプーンなどまとめて', url:'https://www.rakuten.co.jp/' },
+    ],
+    美容: [
+      { tag:'定番アイテム', emoji:'🧴', name:'スキンケアセット',    desc:'洗顔・化粧水・乳液がひとつに', url:'https://www.rakuten.co.jp/' },
+      { tag:'人気商品',   emoji:'💄', name:'プチプラコスメ',      desc:'口コミ高評価のデイリーメイク', url:'https://www.rakuten.co.jp/' },
+      { tag:'おすすめ',   emoji:'✨', name:'美容家電・ヘアケア',  desc:'自宅でサロン級のケアを', url:'https://www.rakuten.co.jp/' },
+    ],
+    暮らし: [
+      { tag:'定番アイテム', emoji:'🗂️', name:'収納グッズ・ボックス',  desc:'スッキリ片づくシンプル収納', url:'https://www.rakuten.co.jp/' },
+      { tag:'人気商品',   emoji:'🍳', name:'キッチン便利グッズ',    desc:'時短・ラクチンな調理アイテム', url:'https://www.rakuten.co.jp/' },
+      { tag:'おすすめ',   emoji:'🏡', name:'インテリア雑貨',        desc:'部屋をおしゃれに変える小物', url:'https://www.rakuten.co.jp/' },
+    ],
+    ダイエット: [
+      { tag:'定番アイテム', emoji:'🥤', name:'プロテイン・女性向け', desc:'飲みやすい・続けやすいと話題', url:'https://www.rakuten.co.jp/' },
+      { tag:'人気商品',   emoji:'🌿', name:'置き換えダイエット食品', desc:'忙しい日のカロリーコントロールに', url:'https://www.rakuten.co.jp/' },
+      { tag:'おすすめ',   emoji:'🏃', name:'フィットネスグッズ',    desc:'自宅で手軽に体を動かせる', url:'https://www.rakuten.co.jp/' },
+    ],
+    語学: [
+      { tag:'定番アイテム', emoji:'📚', name:'英語教材・テキスト',   desc:'大人の学び直しに定評あり', url:'https://www.rakuten.co.jp/' },
+      { tag:'人気商品',   emoji:'🎧', name:'英語リスニング教材',    desc:'通勤・家事しながら聞けるCD付き', url:'https://www.rakuten.co.jp/' },
+      { tag:'おすすめ',   emoji:'✏️', name:'子ども英語・絵本',     desc:'親子で楽しめる英語学習グッズ', url:'https://www.rakuten.co.jp/' },
+    ],
+  };
+
+  const bgMap = { 育児:'linear-gradient(135deg,#EDE9FE,#DDD6FE)', ダイエット:'linear-gradient(135deg,#D1FAE5,#A7F3D0)', 美容:'linear-gradient(135deg,#FCE7F3,#FBD5E8)', 暮らし:'linear-gradient(135deg,#FEF3C7,#FDE68A)', 語学:'linear-gradient(135deg,#E0F2FE,#BAE6FD)' };
+  const bg = bgMap[top] || 'linear-gradient(135deg,#F3F4F6,#E5E7EB)';
+  const products = productData[top] || [];
+
   const ctaCard = document.querySelector('.cta-card');
   let productSection = document.getElementById('product-section');
   if (productSection) productSection.remove();
@@ -501,33 +534,21 @@ function showResult(){
   productSection.innerHTML = `
     <div class="result-section-title" style="margin-top:16px;">🛍️ こんな商品から始めてみよう！</div>
     <p style="font-size:12px;color:var(--text-hint);margin-bottom:10px;">楽天で実際に紹介できる商品の例です</p>
-    <div id="product-cards" style="display:flex;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px;scrollbar-width:none;">
-      ${[0,1,2].map(()=>`<div style="flex-shrink:0;width:150px;border-radius:var(--r-sm);overflow:hidden;background:#F3F4F6;"><div style="height:120px;background:#E5E7EB;border-radius:var(--r-sm) var(--r-sm) 0 0;"></div><div style="padding:10px;"><div style="height:12px;background:#D1D5DB;border-radius:4px;margin-bottom:6px;"></div><div style="height:12px;background:#D1D5DB;border-radius:4px;width:70%;margin-bottom:10px;"></div><div style="height:28px;background:#D1D5DB;border-radius:99px;"></div></div></div>`).join('')}
-    </div>`;
-  ctaCard.parentNode.insertBefore(productSection, ctaCard);
-
-  // 楽天API取得
-  fetch('/api/rakuten?genre=' + encodeURIComponent(top))
-    .then(r => r.ok ? r.json() : Promise.reject())
-    .then(data => {
-      const cards = document.getElementById('product-cards');
-      if (!data.items || data.items.length === 0) { productSection.style.display='none'; return; }
-      const bgMap = { 育児:'linear-gradient(135deg,#EDE9FE,#DDD6FE)', ダイエット:'linear-gradient(135deg,#D1FAE5,#A7F3D0)', 美容:'linear-gradient(135deg,#FCE7F3,#FBD5E8)', 暮らし:'linear-gradient(135deg,#FEF3C7,#FDE68A)', 語学:'linear-gradient(135deg,#E0F2FE,#BAE6FD)' };
-      const bg = bgMap[top] || 'linear-gradient(135deg,#F3F4F6,#E5E7EB)';
-      cards.innerHTML = data.items.map(item => `
+    <div style="display:flex;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px;scrollbar-width:none;">
+      ${products.map(p => `
         <div style="flex-shrink:0;width:150px;border-radius:var(--r-sm);overflow:hidden;background:white;box-shadow:var(--shadow);border:1px solid var(--border);">
-          <div style="height:120px;background:${bg};display:flex;align-items:center;justify-content:center;overflow:hidden;">
-            ${item.imageUrl ? `<img src="${item.imageUrl}" alt="" style="width:100%;height:100%;object-fit:cover;">` : '<span style="font-size:32px;">🛒</span>'}
+          <div style="height:120px;background:${bg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+            <span style="font-size:10px;font-weight:700;background:rgba(255,255,255,0.75);padding:3px 10px;border-radius:99px;color:#555;">${p.tag}</span>
+            <span style="font-size:38px;">${p.emoji}</span>
           </div>
           <div style="padding:10px;">
-            <p style="font-size:11px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${item.name}</p>
-            <p style="font-size:12px;font-weight:900;color:var(--text);margin-bottom:3px;">¥${item.price.toLocaleString()}</p>
-            <p style="font-size:10px;color:var(--text-hint);margin-bottom:8px;">★${item.reviewAverage} (${item.reviewCount}件)</p>
-            <a href="${item.affiliateUrl}" target="_blank" rel="noopener" style="display:block;text-align:center;background:#BF0000;color:white;font-size:11px;font-weight:700;padding:7px 4px;border-radius:99px;text-decoration:none;">楽天で見る 🛒</a>
+            <p style="font-size:11px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${p.name}</p>
+            <p style="font-size:10px;color:var(--text-hint);line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${p.desc}</p>
+            <a href="${p.url}" target="_blank" rel="noopener" style="display:block;text-align:center;background:#BF0000;color:white;font-size:11px;font-weight:700;padding:7px 4px;border-radius:99px;text-decoration:none;">楽天で見る 🛒</a>
           </div>
-        </div>`).join('');
-    })
-    .catch(() => { if (productSection) productSection.style.display = 'none'; });
+        </div>`).join('')}
+    </div>`;
+  ctaCard.parentNode.insertBefore(productSection, ctaCard);
 
   showScreen('screen-result');launchConfetti();
   setTimeout(()=>{sorted.forEach((g,i)=>{setTimeout(()=>{const pct=Math.round((scores[g]/maxScore)*100);const fill=document.getElementById('sf-'+g),label=document.getElementById('sp-'+g);if(fill)fill.style.width=pct+'%';if(label)label.textContent=pct+'%';},i*120);});},400);
