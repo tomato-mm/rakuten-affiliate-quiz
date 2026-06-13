@@ -38,21 +38,9 @@ module.exports = async function handler(req, res) {
     const response = await fetch(url);
     const data = await response.json();
 
-    if (!data.Items || data.Items.length === 0) {
-      return res.status(200).json({ items: [] });
-    }
-
-    const items = data.Items.map((item) => ({
-      name: item.itemName,
-      imageUrl: item.mediumImageUrls?.[0]?.imageUrl || '',
-      price: item.itemPrice,
-      reviewCount: item.reviewCount,
-      reviewAverage: item.reviewAverage,
-      affiliateUrl: item.affiliateUrl || item.itemUrl,
-    }));
-
-    return res.status(200).json({ items });
+    // デバッグ用：生レスポンスをそのまま返す
+    return res.status(200).json({ debug: true, url: url.replace(appId, 'APP_ID'), raw: data });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch Rakuten API' });
+    return res.status(500).json({ error: err.message });
   }
 };
