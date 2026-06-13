@@ -44,7 +44,7 @@ body { font-family: "Noto Sans JP", sans-serif; background: var(--bg); color: va
 .btn-start:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(139,92,246,0.42); }
 .btn-start:active { transform: translateY(0); }
 .start-note { margin-top: 14px; font-size: 12px; color: var(--text-hint); }
-#screen-quiz { justify-content: flex-start; padding: 0; background: linear-gradient(155deg, #FFF5F9 0%, #F5F3FF 60%, #FFF8F0 100%); }
+#screen-quiz { justify-content: flex-start; padding: 0; background: linear-gradient(155deg, #FFF5F9 0%, #F5F3FF 60%, #FFF8F0 100%); overflow: hidden; }
 .quiz-header { position: sticky; top: 0; z-index: 10; width: 100%; padding: 16px 20px 12px; backdrop-filter: blur(12px); background: rgba(255,251,254,0.88); border-bottom: 1px solid rgba(139,92,246,0.08); }
 .quiz-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .quiz-qnum { font-size: 12px; font-weight: 700; color: var(--purple); background: var(--purple-light); padding: 4px 12px; border-radius: 99px; }
@@ -52,7 +52,8 @@ body { font-family: "Noto Sans JP", sans-serif; background: var(--bg); color: va
 .progress-steps { display: flex; gap: 4px; align-items: center; }
 .p-step { height: 6px; flex: 1; border-radius: 99px; background: rgba(139,92,246,0.12); transition: background 0.3s; overflow: hidden; }
 .p-step.done { background: var(--purple); } .p-step.active { background: linear-gradient(90deg, var(--pink), var(--purple)); }
-.quiz-body { position: relative; z-index: 1; width: 100%; max-width: 520px; margin: 0 auto; padding: 20px 20px 120px; }
+.quiz-body { position: relative; z-index: 1; flex: 1; width: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; padding: 0 0 8px; }
+.quiz-body-inner { max-width: 520px; margin: 0 auto; padding: 20px 20px 20px; }
 .q-illust-wrap { width: 100%; display: flex; justify-content: center; margin-bottom: 16px; }
 .q-card-wrap { position: relative; perspective: 600px; }
 .q-card { background: var(--card); border-radius: var(--r); padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); animation: card-in 0.35s cubic-bezier(0.34, 1.2, 0.64, 1) both; }
@@ -75,7 +76,7 @@ body { font-family: "Noto Sans JP", sans-serif; background: var(--bg); color: va
 .opt-check { position: relative; z-index: 1; flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(139,92,246,0.25); background: white; display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
 .opt.selected .opt-check { background: var(--purple); border-color: var(--purple); }
 .opt-check svg { display: none; } .opt.selected .opt-check svg { display: block; }
-.quiz-footer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; padding: 16px 20px 24px; background: linear-gradient(to top, rgba(255,251,254,0.98) 70%, transparent); }
+.quiz-footer { flex-shrink: 0; z-index: 10; padding: 12px 20px 24px; background: linear-gradient(to top, rgba(255,251,254,0.98) 80%, transparent); }
 .quiz-footer-inner { max-width: 520px; margin: 0 auto; display: flex; gap: 12px; }
 .btn-back { flex-shrink: 0; width: 50px; height: 50px; border-radius: 50%; border: 1.5px solid var(--border); background: white; color: var(--text-sub); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
 .btn-back:hover:not(:disabled) { border-color: var(--purple); color: var(--purple); }
@@ -182,7 +183,7 @@ body { font-family: "Noto Sans JP", sans-serif; background: var(--bg); color: va
       </svg>
     </div>
     <h1 class="start-title">あなたにぴったりな<br>楽天アフィリエイト<br>ジャンルを診断！</h1>
-    <p class="start-sub">特別なスキルも資格も不要。<br>日常のことを答えるだけで、<br>あなたに合ったジャンルがわかります✨</p>
+    <p class="start-sub">日常のことを答えるだけで、<br>あなたに合ったジャンルがわかります✨</p>
     <div class="start-points">
       <div class="start-point"><div class="point-icon pi-pink">📱</div><div>12の質問に答えるだけ（約3分）</div></div>
       <div class="start-point"><div class="point-icon pi-purple">🎯</div><div>5ジャンルの中からあなたに合ったものを診断</div></div>
@@ -203,12 +204,14 @@ body { font-family: "Noto Sans JP", sans-serif; background: var(--bg); color: va
     <div class="progress-steps" id="progress-steps"></div>
   </div>
   <div class="quiz-body">
-    <div class="q-illust-wrap" id="q-illust-wrap"></div>
-    <div class="q-card-wrap">
-      <div class="q-card" id="q-card">
-        <div class="q-scene-tag" id="q-scene-tag"></div>
-        <div class="q-text" id="q-text"></div>
-        <div class="q-opts" id="q-opts"></div>
+    <div class="quiz-body-inner">
+      <div class="q-illust-wrap" id="q-illust-wrap"></div>
+      <div class="q-card-wrap">
+        <div class="q-card" id="q-card">
+          <div class="q-scene-tag" id="q-scene-tag"></div>
+          <div class="q-text" id="q-text"></div>
+          <div class="q-opts" id="q-opts"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -279,34 +282,34 @@ const questions = [
   { scene: "🌿 最近の関心", text: "最近、日常の中でよく調べていることはどれですか？", illustKey: "phone",
     opts: [
       { label: "子どもや家族に関すること", sub: "成長・遊び・学び・家族時間など", emoji: "👨‍👩‍👧", scores: { 育児:3, 暮らし:1 }, typeScores: { review:1, experience:1 } },
-      { label: "美容や自分磨き", sub: "肌・髪・メイク・気分が上がるもの", emoji: "💄", scores: { 美容:3 }, typeScores: { review:2, photo:1 } },
-      { label: "家事・収納・暮らしの工夫", sub: "ラクしたい・整えたい・便利にしたい", emoji: "🏡", scores: { 暮らし:3 }, typeScores: { photo:1, comparison:1 } },
-      { label: "健康や体のコンディション", sub: "食事・運動・毎日を軽やかに過ごす", emoji: "🥗", scores: { ダイエット:3 }, typeScores: { record:1, experience:1 } },
-      { label: "勉強・語学・スキルアップ", sub: "学び直しや将来のための準備", emoji: "📚", scores: { 語学:3 }, typeScores: { record:2, comparison:1 } }
+      { label: "美容や自分磨き", sub: "肌・髪・メイク・スキンケアなど", emoji: "💄", scores: { 美容:3 }, typeScores: { review:2, photo:1 } },
+      { label: "家事・収納・暮らしの工夫", sub: "片づけ・時短・便利グッズなど", emoji: "🏡", scores: { 暮らし:3 }, typeScores: { photo:1, comparison:1 } },
+      { label: "健康や体のコンディション", sub: "食事・運動・生活リズムなど", emoji: "🥗", scores: { ダイエット:3 }, typeScores: { record:1, experience:1 } },
+      { label: "勉強・語学・スキルアップ", sub: "英語・資格・学び直しなど", emoji: "📚", scores: { 語学:3 }, typeScores: { record:2, comparison:1 } }
     ] },
   { scene: "🛒 お買い物の習慣", text: "楽天で買い物するとき、どんな理由で商品を選ぶことが多いですか？", illustKey: "shopping",
     opts: [
       { label: "家族や子どもが喜びそうだから", sub: "使う人の顔を思い浮かべて選ぶ", emoji: "🎁", scores: { 育児:2, 暮らし:1 }, typeScores: { review:1 } },
-      { label: "口コミが良くて自分も試したいから", sub: "レビューを読み込んでから買う", emoji: "⭐", scores: { 美容:2, ダイエット:1 }, typeScores: { review:2 } },
-      { label: "家事や生活がラクになりそうだから", sub: "便利さ・時短・使いやすさ重視", emoji: "🧺", scores: { 暮らし:3 }, typeScores: { comparison:1 } },
-      { label: "健康や体の調子に役立ちそうだから", sub: "無理なく整えるものに惹かれる", emoji: "🌿", scores: { ダイエット:3 }, typeScores: { record:1 } },
-      { label: "勉強や成長につながりそうだから", sub: "未来の自分への投資感がある", emoji: "✏️", scores: { 語学:3 }, typeScores: { comparison:1, record:1 } }
+      { label: "口コミが良くて自分も試したいから", sub: "使った人の感想を見て選ぶ", emoji: "⭐", scores: { 美容:2, ダイエット:1 }, typeScores: { review:2 } },
+      { label: "家事や生活がラクになりそうだから", sub: "便利さ・時短・使いやすさで選ぶ", emoji: "🧺", scores: { 暮らし:3 }, typeScores: { comparison:1 } },
+      { label: "健康や体の調子に役立ちそうだから", sub: "無理なく続けられそうなものを選ぶ", emoji: "🌿", scores: { ダイエット:3 }, typeScores: { record:1 } },
+      { label: "勉強や成長につながりそうだから", sub: "これからの自分に役立ちそうで選ぶ", emoji: "✏️", scores: { 語学:3 }, typeScores: { comparison:1, record:1 } }
     ] },
   { scene: "📱 SNS・動画の時間", text: "スマホでついつい長く見てしまうコンテンツは？", illustKey: "phone",
     opts: [
-      { label: "育児・家族の日常ブログやInstagram", sub: "「わかる〜！」と共感しながら見る", emoji: "👶", scores: { 育児:3 }, typeScores: { experience:1 } },
-      { label: "コスメ・美容の紹介動画やレビュー", sub: "気づいたら1時間は見てる", emoji: "💄", scores: { 美容:3 }, typeScores: { review:2 } },
-      { label: "暮らし・片づけ・インテリア系", sub: "マネしたくなる部屋づくり", emoji: "🏡", scores: { 暮らし:3 }, typeScores: { photo:1 } },
-      { label: "食事・ヘルスケア・体づくりの投稿", sub: "「参考にしよう」と保存することが多い", emoji: "🌿", scores: { ダイエット:3 }, typeScores: { record:1 } },
-      { label: "語学・勉強・スキルアップ系YouTube", sub: "スキマ時間に少しずつ見ている", emoji: "📚", scores: { 語学:3 }, typeScores: { record:1 } }
+      { label: "育児・家族の日常ブログやInstagram", sub: "「わかる…！」と思いながら見てしまう", emoji: "👶", scores: { 育児:3 }, typeScores: { experience:1 } },
+      { label: "コスメ・美容の紹介動画やレビュー", sub: "気になる商品の口コミまで見てしまう", emoji: "💄", scores: { 美容:3 }, typeScores: { review:2 } },
+      { label: "暮らし・片づけ・インテリア系", sub: "あとで見返したくて保存しがち", emoji: "🏡", scores: { 暮らし:3 }, typeScores: { photo:1 } },
+      { label: "食事・ヘルスケア・体づくりの投稿", sub: "自分にもできそうな方法を探してしまう", emoji: "🌿", scores: { ダイエット:3 }, typeScores: { record:1 } },
+      { label: "語学・勉強・スキルアップ系YouTube", sub: "少しだけ学ぶつもりが続けて見てしまう", emoji: "📚", scores: { 語学:3 }, typeScores: { record:1 } }
     ] },
   { scene: "👯 友だちとの会話", text: "友だちや知人から「詳しいね」「教えて！」と言われやすいテーマは？", illustKey: "friends",
     opts: [
-      { label: "育児・子どもグッズ・保育系", sub: "経験から自然に話せる", emoji: "🍼", scores: { 育児:3, 暮らし:1 }, typeScores: { experience:2 } },
-      { label: "コスメ・肌のケア・ヘアスタイル", sub: "センスよく答えられる", emoji: "✨", scores: { 美容:3 }, typeScores: { review:1 } },
-      { label: "片づけ・収納・家の中のこと", sub: "実体験ベースで話しやすい", emoji: "🏠", scores: { 暮らし:3 }, typeScores: { photo:1 } },
-      { label: "食事の工夫・体の整え方・健康習慣", sub: "生活の中から話題がある", emoji: "🥗", scores: { ダイエット:3 }, typeScores: { record:1 } },
-      { label: "英語・語学・学び直しのこと", sub: "具体的なアドバイスができる", emoji: "🌍", scores: { 語学:3 }, typeScores: { comparison:1 } }
+      { label: "育児・子どもグッズ・保育系", sub: "実際に試したものなら話しやすい", emoji: "🍼", scores: { 育児:3, 暮らし:1 }, typeScores: { experience:2 } },
+      { label: "コスメ・肌のケア・ヘアスタイル", sub: "使ってよかったものなら話しやすい", emoji: "✨", scores: { 美容:3 }, typeScores: { review:1 } },
+      { label: "片づけ・収納・家の中のこと", sub: "日々の工夫なら話しやすい", emoji: "🏠", scores: { 暮らし:3 }, typeScores: { photo:1 } },
+      { label: "食事の工夫・体の整え方・健康習慣", sub: "続けていることなら話しやすい", emoji: "🥗", scores: { ダイエット:3 }, typeScores: { record:1 } },
+      { label: "英語・語学・学び直しのこと", sub: "使った教材や続け方なら話しやすい", emoji: "🌍", scores: { 語学:3 }, typeScores: { comparison:1 } }
     ] },
   { scene: "🌱 最近整えたいこと", text: "最近「もう少し整えたいな」と思うことはどれですか？", illustKey: "worry",
     opts: [
@@ -318,40 +321,40 @@ const questions = [
     ] },
   { scene: "🛍️ 買ってよかったもの", text: "「これ買ってよかった！」と誰かに話したくなるのはどの分野ですか？", illustKey: "gift",
     opts: [
-      { label: "育児・子ども用品・知育グッズ", sub: "実際に使って感動したものがある", emoji: "🧸", scores: { 育児:3 }, typeScores: { review:2 } },
-      { label: "コスメ・スキンケア・美容アイテム", sub: "お気に入りがいくつかある", emoji: "💅", scores: { 美容:3 }, typeScores: { review:2 } },
-      { label: "キッチン用品・収納・生活雑貨", sub: "使い心地や便利さを伝えたい", emoji: "🍳", scores: { 暮らし:3 }, typeScores: { photo:1, review:1 } },
-      { label: "健康食品・フィットネス用品・食材", sub: "続けて気づいたことがある", emoji: "🌿", scores: { ダイエット:3 }, typeScores: { record:1, experience:1 } },
-      { label: "参考書・語学教材・学習グッズ", sub: "使い方のコツや感想を伝えられる", emoji: "📖", scores: { 語学:3 }, typeScores: { review:1, comparison:1 } }
+      { label: "育児・子ども用品・知育グッズ", sub: "実際に助かったものを話したくなる", emoji: "🧸", scores: { 育児:3 }, typeScores: { review:2 } },
+      { label: "コスメ・スキンケア・美容アイテム", sub: "使ってよかった感想を話したくなる", emoji: "💅", scores: { 美容:3 }, typeScores: { review:2 } },
+      { label: "キッチン用品・収納・生活雑貨", sub: "便利だったポイントを話したくなる", emoji: "🍳", scores: { 暮らし:3 }, typeScores: { photo:1, review:1 } },
+      { label: "健康食品・フィットネス用品・食材", sub: "続けてみた感想を話したくなる", emoji: "🌿", scores: { ダイエット:3 }, typeScores: { record:1, experience:1 } },
+      { label: "参考書・語学教材・学習グッズ", sub: "使ってみたコツを話したくなる", emoji: "📖", scores: { 語学:3 }, typeScores: { review:1, comparison:1 } }
     ] },
   { scene: "📸 発信のしやすさ", text: "スマホで写真を撮って紹介しやすいのはどれですか？", illustKey: "blog",
     opts: [
       { label: "子ども用品・おもちゃ・絵本", sub: "使っている様子やサイズ感を伝えやすい", emoji: "🧸", scores: { 育児:3 }, typeScores: { photo:2 } },
       { label: "コスメ・スキンケア用品", sub: "パッケージや使用感を紹介しやすい", emoji: "💄", scores: { 美容:3 }, typeScores: { photo:2 } },
-      { label: "キッチン用品・収納グッズ", sub: "ビフォーアフターが見せやすい", emoji: "🍳", scores: { 暮らし:3 }, typeScores: { photo:2 } },
-      { label: "食事・健康グッズ・運動アイテム", sub: "日々の記録と一緒に紹介できる", emoji: "🥗", scores: { ダイエット:3 }, typeScores: { photo:1, record:1 } },
-      { label: "本・教材・文具", sub: "学習記録や使い方と相性がいい", emoji: "📚", scores: { 語学:3 }, typeScores: { photo:1, record:1 } }
+      { label: "キッチン用品・収納グッズ", sub: "使う前後の変化を見せやすい", emoji: "🍳", scores: { 暮らし:3 }, typeScores: { photo:2 } },
+      { label: "食事・健康グッズ・運動アイテム", sub: "日々の記録と一緒に紹介しやすい", emoji: "🥗", scores: { ダイエット:3 }, typeScores: { photo:1, record:1 } },
+      { label: "本・教材・文具", sub: "学習記録や使い方と一緒に紹介しやすい", emoji: "📚", scores: { 語学:3 }, typeScores: { photo:1, record:1 } }
     ] },
   { scene: "🌱 続けやすさ", text: "1ヶ月続けるなら、どの投稿スタイルが一番ラクそうですか？", illustKey: "continue",
     opts: [
-      { label: "買ってよかったものを写真付きで紹介する", sub: "レビュー感覚で続けられる", emoji: "📸", scores: { 暮らし:1, 美容:1, 育児:1 }, typeScores: { review:2, photo:1 } },
-      { label: "使う前後の変化や感想を記録する", sub: "自分の変化をメモする感覚", emoji: "📝", scores: { 美容:1, ダイエット:2 }, typeScores: { record:2, experience:1 } },
-      { label: "困ったことと解決策を書く", sub: "誰かの悩み解決に役立ちそう", emoji: "💡", scores: { 育児:2, 暮らし:1 }, typeScores: { experience:2 } },
-      { label: "比較して選んだ理由を書く", sub: "じっくり調べるのが苦じゃない", emoji: "🔍", scores: { 語学:1, 美容:1, 暮らし:1 }, typeScores: { comparison:2 } },
-      { label: "自分の成長記録を残す", sub: "少しずつ積み上げるのが好き", emoji: "🌷", scores: { 語学:2, ダイエット:1 }, typeScores: { record:2 } }
+      { label: "買ってよかったものを写真付きで紹介する", sub: "レビュー感覚で続けやすい", emoji: "📸", scores: { 暮らし:1, 美容:1, 育児:1 }, typeScores: { review:2, photo:1 } },
+      { label: "使う前後の変化や感想を記録する", sub: "自分用のメモ感覚で続けやすい", emoji: "📝", scores: { 美容:1, ダイエット:2 }, typeScores: { record:2, experience:1 } },
+      { label: "困ったことと解決策を書く", sub: "誰かの悩み解決として書きやすい", emoji: "💡", scores: { 育児:2, 暮らし:1 }, typeScores: { experience:2 } },
+      { label: "比較して選んだ理由を書く", sub: "調べたことをまとめる感覚で書きやすい", emoji: "🔍", scores: { 語学:1, 美容:1, 暮らし:1 }, typeScores: { comparison:2 } },
+      { label: "自分の成長記録を残す", sub: "少しずつ積み上げる形が続けやすい", emoji: "🌷", scores: { 語学:2, ダイエット:1 }, typeScores: { record:2 } }
     ] },
-  { scene: "🎁 プレゼントを選ぶとき", text: "友人や家族へのプレゼント、どのジャンルを選ぶのが得意ですか？", illustKey: "gift",
+  { scene: "🎁 プレゼントを選ぶとき", text: "友人や家族へのプレゼントで、選びやすいジャンルはどれですか？", illustKey: "gift",
     opts: [
-      { label: "ベビー・子ども向けグッズ", sub: "何が喜ばれるかよくわかる", emoji: "🧸", scores: { 育児:3 }, typeScores: { review:1 } },
-      { label: "コスメ・入浴剤・美容アイテム", sub: "センスよく選ぶのが得意", emoji: "🌸", scores: { 美容:3 }, typeScores: { review:1 } },
-      { label: "キッチン用品・生活雑貨・食品", sub: "実用的なもので喜ばれる", emoji: "🍳", scores: { 暮らし:3 }, typeScores: { comparison:1 } },
-      { label: "健康グッズ・食品・お茶など", sub: "体をいたわるものを選びがち", emoji: "🌿", scores: { ダイエット:3 }, typeScores: { review:1 } },
-      { label: "本・文具・学べるもの", sub: "知的好奇心を刺激したい", emoji: "📚", scores: { 語学:3 }, typeScores: { comparison:1 } }
+      { label: "ベビー・子ども向けグッズ", sub: "相手の年齢や使う場面を想像しやすい", emoji: "🧸", scores: { 育児:3 }, typeScores: { review:1 } },
+      { label: "コスメ・入浴剤・美容アイテム", sub: "相手が喜びそうなものを選びやすい", emoji: "🌸", scores: { 美容:3 }, typeScores: { review:1 } },
+      { label: "キッチン用品・生活雑貨・食品", sub: "実用的で使いやすいものを選びやすい", emoji: "🍳", scores: { 暮らし:3 }, typeScores: { comparison:1 } },
+      { label: "健康グッズ・食品・お茶など", sub: "相手をいたわるものを選びやすい", emoji: "🌿", scores: { ダイエット:3 }, typeScores: { review:1 } },
+      { label: "本・文具・学べるもの", sub: "相手の興味に合わせて選びやすい", emoji: "📚", scores: { 語学:3 }, typeScores: { comparison:1 } }
     ] },
   { scene: "🤝 読者への気持ち", text: "あなたのブログやSNSを読む人に、一番届けたいメッセージは？", illustKey: "heart",
     opts: [
       { label: "「育児の悩みはあなただけじゃないよ」", sub: "孤独を感じるママに寄り添いたい", emoji: "💕", scores: { 育児:3 }, typeScores: { experience:2 } },
-      { label: "「自分を大切にすることを忘れないで」", sub: "美しくいる喜びを伝えたい", emoji: "🌷", scores: { 美容:3 }, typeScores: { review:1, experience:1 } },
+      { label: "「自分を大切にすることを忘れないで」", sub: "自分をいたわる時間を届けたい", emoji: "🌷", scores: { 美容:3 }, typeScores: { review:1, experience:1 } },
       { label: "「毎日の暮らしをちょっと整えよう」", sub: "小さな快適さを増やしたい", emoji: "🏡", scores: { 暮らし:3 }, typeScores: { photo:1, experience:1 } },
       { label: "「食事や習慣を整えると毎日が変わる」", sub: "無理なく続けるヒントを届けたい", emoji: "🌿", scores: { ダイエット:3 }, typeScores: { record:1, experience:1 } },
       { label: "「語学はいつからでも始められる」", sub: "一歩を踏み出すきっかけを作りたい", emoji: "🌍", scores: { 語学:3 }, typeScores: { record:1, comparison:1 } }
@@ -360,17 +363,17 @@ const questions = [
     opts: [
       { label: "1日10分くらい", sub: "まずはスマホで少しだけ", emoji: "📱", scores: {}, typeScores: {} },
       { label: "1日30分くらい", sub: "短い記事や投稿ならできそう", emoji: "⏰", scores: {}, typeScores: {} },
-      { label: "週末にまとめて", sub: "平日は忙しいが、まとめ作業ならOK", emoji: "🗓️", scores: {}, typeScores: {} },
+      { label: "週末にまとめて", sub: "平日は忙しいけど、まとめ作業ならOK", emoji: "🗓️", scores: {}, typeScores: {} },
       { label: "子どもが寝たあとに少し", sub: "夜の静かな時間を使いたい", emoji: "🌙", scores: {}, typeScores: {} },
       { label: "まだわからないけど試したい", sub: "まずは負担なく始めたい", emoji: "🌱", scores: {}, typeScores: {} }
     ] },
   { scene: "✍️ 発信スタイル", text: "最初にやってみたい発信スタイルに近いのはどれですか？", illustKey: "blog",
     opts: [
-      { label: "使ったものをブログで詳しくレビュー", sub: "文章でしっかり伝えたい", emoji: "📝", scores: { 美容:1, 暮らし:1, 育児:1 }, typeScores: { review:3 } },
-      { label: "写真＋一言コメントをSNSに投稿", sub: "短く気軽に続けたい", emoji: "📸", scores: { 美容:1, 暮らし:1 }, typeScores: { photo:3 } },
-      { label: "体験談を詳しくまとめた記事を書く", sub: "自分の経験をしっかり伝えたい", emoji: "💬", scores: { ダイエット:1, 育児:1 }, typeScores: { experience:3 } },
-      { label: "複数商品を比べて選ぶ記事を書く", sub: "じっくり調べて書くのが好き", emoji: "🔍", scores: { 語学:1, 暮らし:1 }, typeScores: { comparison:3 } },
-      { label: "毎日の記録・日記感覚で発信する", sub: "少しずつ積み上げる感じが合ってる", emoji: "🌱", scores: { 語学:1, ダイエット:1 }, typeScores: { record:3 } }
+      { label: "使ったものをブログで詳しくレビュー", sub: "文章でしっかり伝えやすい", emoji: "📝", scores: { 美容:1, 暮らし:1, 育児:1 }, typeScores: { review:3 } },
+      { label: "写真＋一言コメントをSNSに投稿", sub: "短く気軽に続けやすい", emoji: "📸", scores: { 美容:1, 暮らし:1 }, typeScores: { photo:3 } },
+      { label: "体験談を詳しくまとめた記事を書く", sub: "自分の経験をしっかり伝えやすい", emoji: "💬", scores: { ダイエット:1, 育児:1 }, typeScores: { experience:3 } },
+      { label: "複数商品を比べて選ぶ記事を書く", sub: "調べたことをまとめる形が合っていそう", emoji: "🔍", scores: { 語学:1, 暮らし:1 }, typeScores: { comparison:3 } },
+      { label: "毎日の記録・日記感覚で発信する", sub: "少しずつ積み上げる形が合っていそう", emoji: "🌱", scores: { 語学:1, ダイエット:1 }, typeScores: { record:3 } }
     ] }
 ];
 
