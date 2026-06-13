@@ -30,7 +30,7 @@ module.exports = async function handler(req, res) {
     hits: '3',
     sort: '-reviewCount',
     minReviewCount: '100',
-    minAffiliateRate: '4.0',
+    minReviewAverage: '4.0',
     imageFlag: '1',
     formatVersion: '2',
   });
