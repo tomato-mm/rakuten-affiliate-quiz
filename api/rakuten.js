@@ -17,29 +17,44 @@ module.exports = async function handler(req, res) {
   }
 
   const appId = process.env.RAKUTEN_APP_ID;
+  const accessKey = process.env.RAKUTEN_ACCESS_KEY;
   const affiliateId = process.env.RAKUTEN_AFFILIATE_ID;
 
-  if (!appId) {
-    return res.status(500).json({ error: 'RAKUTEN_APP_ID not set' });
+  if (!appId || !accessKey) {
+    return res.status(500).json({ error: 'Missing API credentials' });
   }
 
   const params = new URLSearchParams({
     applicationId: appId,
+    accessKey: accessKey,
     affiliateId: affiliateId || '',
     keyword,
     hits: '3',
     sort: '-reviewCount',
+    hasReviewFlag: '1',
     imageFlag: '1',
     formatVersion: '2',
   });
 
   try {
-    const url = `https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?${params}`;
+    const url = `https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260401?${params}`;
     const response = await fetch(url);
     const data = await response.json();
 
-    // デバッグ用：生レスポンスをそのまま返す
-    return res.status(200).json({ debug: true, appIdPrefix: appId ? appId.slice(0,4)+'****' : 'EMPTY', url: url.replace(appId, 'APP_ID'), raw: data });
+    if (!data.Items || data.Items.length === 0) {
+      return res.status(200).json({ items: [] });
+    }
+
+    const items = data.Items.map((item) => ({
+      name: item.itemName,
+      imageUrl: item.mediumImageUrls?.[0]?.imageUrl || '',
+      price: item.itemPrice,
+      reviewCount: item.reviewCount,
+      reviewAverage: item.reviewAverage,
+      affiliateUrl: item.affiliateUrl || item.itemUrl,
+    }));
+
+    return res.status(200).json({ items });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
